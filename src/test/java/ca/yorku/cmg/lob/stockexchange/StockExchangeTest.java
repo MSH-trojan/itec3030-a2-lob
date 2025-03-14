@@ -89,7 +89,7 @@ class StockExchangeTest {
 	 * This test does not initially pass. It requires a solution to the observer part of the assignment for it to pass.
 	 * To turn it off while working on the first parts uncomment the @Disabled annotation below. 
 	 */
-	//@Disabled
+	@Disabled	// We disable the pushtest here! so then it'll work for the temporary mvn test
 	@Test
 	void pushTest() {
 		
