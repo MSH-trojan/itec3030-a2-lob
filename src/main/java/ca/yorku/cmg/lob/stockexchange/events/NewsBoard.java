@@ -5,19 +5,23 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.PriorityQueue;
 import java.util.Set;
 
 import ca.yorku.cmg.lob.security.Security;
 import ca.yorku.cmg.lob.security.SecurityList;
+import ca.yorku.cmg.lob.stockexchange.tradingagent.INewsObserver;
+
 
 /**
  * A NewsBoard object generates and shares financial/economic events that affect specific securities 
  */
-public class NewsBoard {
+public class NewsBoard implements INewsSubject{
 
 	//Events are queued ordered by time
-	PriorityQueue<Event> eventQueue = new PriorityQueue<>((e1, e2) -> Long.compare(e1.getTime(), e2.getTime()));
+	
 
 	SecurityList securities;
 	
@@ -122,12 +126,39 @@ public class NewsBoard {
 		return (e);
 	}
 	
+	// Update: The Observer part, defining new variables and new methods for notifiction, registration.
+	
+	private List<INewsObserver> observers = new ArrayList<>();
+	private PriorityQueue<Event> eventQueue = new PriorityQueue<>((e1, e2) -> Long.compare(e1.getTime(), e2.getTime()));
+	
+	@Override
+	
+	public void registerObserver(INewsObserver observer) {
+		observers.add(observer);
+	}
+	@Override
+	
+	public void removeObserver(INewsObserver observer) {
+		observers.remove(observer);
+	}
+	
+	@Override
+	
+	public void notifyObservers(Event e) {
+		for (INewsObserver observer : observers) {
+			observer.update(e);
+		}
+	}
+	
 	
 	/**
 	 * Stub for the observer part. Runs the entire queue of events and sends notifications to registered trading agents.   
 	 */
 	public void runEventsList() {
-
+		while (!eventQueue.isEmpty()) {
+			Event e = eventQueue.poll();
+			notifyObservers(e);
+		}
 	}
 	
 	

@@ -18,7 +18,7 @@ import ca.yorku.cmg.lob.trader.Trader;
 /**
  * An trading agent that receives news and reacts by submitting ask or bid orders.
  */
-public abstract class TradingAgent {
+public abstract class TradingAgent implements INewsObserver{
 	protected ITradingStrategy strat; // Update: for referencing to the Strategy class, we make a Strategy reference attribute.
 	protected Trader t;
 	protected StockExchange exc;
@@ -37,7 +37,22 @@ public abstract class TradingAgent {
 		this.exc = e;
 		this.news = n;
 		this.strat = s;
+		this.news.registerObserver(this);
 	}
+	/* 
+	 * Receives event updates from NewsBoard
+	 * @param e The event occurance
+	 * 
+	 * 
+	 */
+	
+	@Override
+	
+	public void update(Event e) {
+		examineEvent(e);
+	}
+	
+
 	
 	/**
 	 * Method to be called as time advances to {@code time}. In response the TradingAgent will poll the NewsBoard for events.
