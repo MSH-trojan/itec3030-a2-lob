@@ -39,8 +39,19 @@ public class NewsBoard {
     	String line;
     	String delimiter = ","; // Assuming the CSV is comma-separated
 
+    	// update_1: defining a new boolean variable
+    	
+    	boolean isFirstLine = true;
+    	
     	try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
     		while ((line = br.readLine()) != null) {
+    			
+    			// update, skipping the reading of the first line (headers) in the event.csv 
+    			
+    			if (isFirstLine) {
+    				isFirstLine = false;
+    				continue;
+    			}
     			String[] values = line.split(delimiter);
 
     			// Ensure the line has exactly two columns

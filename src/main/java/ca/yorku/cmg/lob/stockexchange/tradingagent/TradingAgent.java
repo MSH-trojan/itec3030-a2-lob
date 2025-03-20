@@ -1,4 +1,14 @@
+/* Name: Mohammad Shahnaei
+ * Student ID: 220907952
+ * 
+ * Important note: the lines of code for which their comment has an *Update* notion are what's been changed by me.
+ */
+
+
+
+
 package ca.yorku.cmg.lob.stockexchange.tradingagent;
+
 
 import ca.yorku.cmg.lob.stockexchange.StockExchange;
 import ca.yorku.cmg.lob.stockexchange.events.Event;
@@ -9,20 +19,24 @@ import ca.yorku.cmg.lob.trader.Trader;
  * An trading agent that receives news and reacts by submitting ask or bid orders.
  */
 public abstract class TradingAgent {
+	protected ITradingStrategy strat; // Update: for referencing to the Strategy class, we make a Strategy reference attribute.
 	protected Trader t;
 	protected StockExchange exc;
 	protected NewsBoard news;
 	
+	
 	/**
-	 * Constructor
+	 * Update: Constructor
 	 * @param t The {@linkplain Trader} object associated with the agent.
 	 * @param e The {@linkplain StockExchange} object at which the agent has an account and trades in. 
 	 * @param n The {@linkplain NewsBoard} object that generates news events.
+	 * @param s The {@linkplain ITradingStrategy} object that now defines the strategy
 	 */
-	public TradingAgent(Trader t, StockExchange e, NewsBoard n) {
+	public TradingAgent(Trader t, StockExchange e, NewsBoard n, ITradingStrategy s) {
 		this.t=t;
 		this.exc = e;
 		this.news = n;
+		this.strat = s;
 	}
 	
 	/**
@@ -33,14 +47,18 @@ public abstract class TradingAgent {
 		pollForEvents(time);
 	}
 
-	/**
+	/** Update:
 	 * Examine if an event is relevant for the Agent, i.e., if the Agent has a position on it.
 	 * @param e The {@linkplain Event} object in question
+	 * 
+	 * Update_1: now i have the strategy class here which delegates trade processing to the strategy pattern.
+	 * Update_2: Fixed the typo Secrity to Security.
 	 */
 	private void examineEvent(Event e) {
-		int positionInSecurity = exc.getAccounts().getTraderAccount(t).getPosition(e.getSecrity().getTicker());
+		int positionInSecurity = exc.getAccounts().getTraderAccount(t).getPosition(e.getSecurity().getTicker());
 		if (positionInSecurity > 0) {
-			actOnEvent(e,positionInSecurity,exc.getPrice(e.getSecrity().getTicker()));
+			strat.actOnEvent(e, positionInSecurity, exc.getPrice(e.getSecurity().getTicker()));
+
 		}
 	}
 
@@ -57,16 +75,35 @@ public abstract class TradingAgent {
 
 	}
 	
+	/*
+	 * this setter, sets our strategy.
+	 */
+	
+	
+	
+	public void setStrategy(ITradingStrategy strategy) {
+		this.strat = strategy;
+	}
+	
+	
+	
 	
 	/**
+	 * Update:
 	 * Act in response to a news {@linkplain Event}. Exact reaction strategy to be implemented by specialized agents.
 	 * @param e The {@linkplain Event} in question
 	 * @param pos The position (number of units) of the trader to the ticker that is mentioned in the Event.
 	 * @param price The current price of the relevant ticker. 
+	 * Update_1: Trading now is done through the strategy class so it's the strategy class's responsibility to call for action here.
+	 * Update_2: changed the abstract to normal, because previously we had this method implemented in the conservative and aggressive classes, but now strategy class takes the responsibility so no need for abstraction here.
+	 * Update_3: removed this method due the fact that its not abstract anymore, moreover, we already have this method in the ExamineEvent action method.
 	 */
-	protected abstract void actOnEvent(Event e, int pos, int price);
+	/*	protected void actOnEvent(Event e, int pos, int price) {
+	 *		strat.actOnEvent(t, exc, news, e , pos, price);
+	 */		
+	
+}
 	
 	
 	
 
-}

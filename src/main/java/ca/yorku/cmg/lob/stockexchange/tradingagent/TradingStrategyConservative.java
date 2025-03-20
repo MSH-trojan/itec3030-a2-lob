@@ -13,21 +13,35 @@ import ca.yorku.cmg.lob.orderbook.Ask;
 /**
  * A trading agent kind that reacts more carefully and conservatively to news.
  */
-public class TradingAgentConservative extends TradingAgent {
 
-	public TradingAgentConservative(Trader t, StockExchange e, NewsBoard n) {
-		super(t, e, n);
-	}
 
+
+	/*	Update_1: implementing the interface
+	 *  Update_2: Changed the name of the class from "TradingAgentConservative" to be "TradingStrategyConservative"  
+	 * 
+	 * 
+	 */
+
+
+public class TradingStrategyConservative implements ITradingStrategy { 
+
+	private Trader t; 
+	private StockExchange exc;
+	
+	
+	 public TradingStrategyConservative(Trader t, StockExchange exc) {
+        this.t = t;
+        this.exc = exc;
+	 
+    }
 	@Override
-	protected void actOnEvent(Event e, int pos, int price) {
+	public void actOnEvent(Event e, int pos, int price) {
 		
 		IOrder newOrder = null;
-		
 		if (e instanceof GoodNews) {
-            newOrder = new Bid(t,e.getSecrity(),(int) Math.round(price*1.05), (int) Math.round(pos*0.2),e.getTime());
+            newOrder = new Bid(t,e.getSecurity(),(int) Math.round(price*1.05), (int) Math.round(pos*0.2),e.getTime());
         } else if (e instanceof BadNews) {
-        	newOrder = new Ask(t,e.getSecrity(),(int) Math.round(price*0.95), (int) Math.round(pos*0.2),e.getTime());
+        	newOrder = new Ask(t,e.getSecurity(),(int) Math.round(price*0.95), (int) Math.round(pos*0.2),e.getTime());
         } else {
             System.out.println("Unknown event type");
         }
@@ -36,5 +50,6 @@ public class TradingAgentConservative extends TradingAgent {
 			exc.submitOrder(newOrder,e.getTime());
 		}
     }
+
 
 }
